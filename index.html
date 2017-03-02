@@ -1,18 +1,17 @@
+
+
 <!doctype html>
 <html>
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Sorting!</title>
 
+		<link href='https://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
-
-		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
-
-		<!-- Printing and PDF exports -->
 		<script>
 			var link = document.createElement( 'link' );
 			link.rel = 'stylesheet';
@@ -20,29 +19,292 @@
 			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
+		<style type="text/css">
+		.reveal code, code {
+			font-family: "Droid Sans Mono", "Office Code Pro", "Source Code Pro", Monaco, Consolas, monospace;
+		}
+		.reveal h3, .reveal h4 {
+			text-transform: none;
+		}
+
+		.leftcode {
+			width: 45%;
+			float: left;
+		}
+
+		.stackright {
+			width: 45%;
+			float: right;
+		}
+		.reveal .stack {
+			border: 3px solid white;
+			margin: 2px;
+		}
+
+		.footer {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			padding: 1em;
+			text-align: center;
+		}
+
+		.reveal .history {
+			font-size: 50%;
+			top: 140px;
+			bottom: 0;
+			left: -130px;
+			padding: 1em;
+			position: absolute;
+		}
+
+		.reveal .history-item {
+			border: 2px solid #999;
+			color: #999;;
+			margin: 4px;
+			padding: 5px;
+			text-align: center;
+		}
+		.reveal .active {
+			color: #fff;
+			border: 2px solid white;
+		}
+		</style>
 	</head>
 	<body>
+		<!--
+		I love sorting. Who doesn't love sorting? Let's talk about sorting!
+
+It's a classic interview question: how do you sort a list? How about in O(N log N) time? (And what does that mean?)
+
+We'll do a quick tour of the fundamental sorting algorithms, like insertion sort, quick sort and merge sort, and also talk about some of the fancy new algorithms you might have heard about, like tim sort.
+		-->
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<div class="footer"><a href="https://twitter.com/chris_swenson">@chris_swenson</a>
+			  &nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				&nbsp;
+				<a href="https://github.com/swenson">github.com/swenson</a>
+				</div>
+				<section>
+					<h1>Sorting!</h1>
+					<p><strong>Christopher Swenson</strong></p>
+					<p>Confoo.CA Montreal 2017</p>
+				</section>
+				<section>
+					<h1>What is this talk?</h1>
+					<p>Sorting!</p>
+					<br />
+
+					<h2>Who is this talk for?</h2>
+					<p>Curious people who love sorting</p>
+				</section>
+				<section>
+					<p>I love sorting</p>
+					<p>I was interested in timsort in the past, and I learned how it worked</p>
+					<p>So I implemented it</p>
+				</section>
+				<section>
+					<h2>Sorting</h2>
+					Classic problem of computer science
+Sort quickly
+Sort with as little extra space as possible
+Not as simple as we'd initially think
+We'll focus on Python's own timsort
+				</section>
+				<section>
+					We’ve probably all “invented” this
+Bubble the largest element to the top
+Bubble the next largest, etc.
+
+for i in range(len(data)):
+  for j in range(len(data) - i):
+    if data[j + 1] < data[j]:
+      data[j], data[j+1] = data[j+1], data[j]    
+
+				</section>
+				<section>
+					<h2>Don't ever use it</h2>
+					Promise me, if you learn one thing from this talk, it’s that you should never use bubble sort
+
+				</section>
+				<section>
+					But why?
+
+					We mostly compare sorting algorithms by
+Number of compares
+Number of swaps (less important)
+Compares are bad
+Expensive function calls (__cmp__)
+				</section>
+				<section>
+					Bad bad bubble sort
+
+					Bubble sort basically uses more compares than any other algorithm
+Exactly n * (n - 1) / 2
+O(n**2)
+				</section>
+				<section>
+					What are some others?
+
+					Selection sort
+<strong>Insertion sort</strong>
+<strong>Quicksort</strong>
+<strong>Mergesort</strong>
+<strong>Timsort</strong>
+
+Heapsort
+Smoothsort
+Sample sort
+Bucket sort
+Bogosort
+				</section>
+				<section>
+					Insertion sort
+
+					Assume elements 0..(i-1) are sorted
+[0, 4, 7, 9, 10, 3, ...]
+[0, 4, 7, 9, 3, 10, ...]
+[0, 4, 7, 3, 9, 10, ...]
+[0, 4, 3, 7, 9, 10, ...]
+[0, 3, 4, 7, 9, 10, ...]
+				</section>
+				<section>
+					Insertion sort (cont’d.)
+
+					Still O(n**2) worst case, but not too terrible on average
+Fairly good for very short lists
+				</section>
+				<section>
+					Detour: binary search
+
+					Wanted to put 3 in [0, 4, 7, 9, 10]
+Start in the middle, 7
+3 < 7, so throw away right half
+Repeat
+Instead of O(n) comparisons, O(log n)
+=> Binary Insertion Sort
+				</section>
+				<section>
+					mergesort
+
+					Recurse: sort left half, sort right half, merge
+[9, 10, 4, 0, 7, 3] # split
+[9, 10, 4], red [0, 7, 3] # split
+blue [9, 10], [4], red [0, 7], [3] # split
+blue [9], blue [10], [4], red [0], red [7], [3] # merge
+blue [9, 10], blue [4], red [0, 7],red  [3] # merge
+blue [4, 9, 10], blue [0, 3, 7] # merge
+[0, 3, 4, 7, 9, 10] # sorted!
+				</section>
+				<section>
+					mergesort is good
+
+					Though simple, mergesort is world-class
+O(n log n) compares
+O(log n) or O(n) storage
+Problems:
+Always O(n log n), even best case
+Can become unbalanced
+				</section>
+				<section>
+					Enter: timsort
+
+					Smart, unbalanced, stable mergesort
+Take advantage of natural sortedness
+But deal well with randomness
+Above all: minimize comparisons
+				</section>
+				<section>
+					timsort, part 1
+
+					Build a stack of run sizes:
+Run: increasing sequence, [0, 2, 5, ...]
+(If decreasing, reverse it in-place)
+Runs must have size 32–64
+If there is not a natural run, make one
+Use binary insertion sort
+				</section>
+				<section>
+					timsort, part 2
+
+					Also, be very careful about creating unbalanced run sizes
+Ensure that the stack [..., A, B, C] maintains:
+A > B + C
+B > C
+Do left- and right-merges to maintain this
+				</section>
+				<section>
+					timsort, part 3
+
+					A > B + C:
+We eventually will merge A with B, C, ...
+Want those merges balanced:
+Reduce memory usage
+Reduce copying
+Poor balancing = insertion sort
+				</section>
+				<section>
+					timsort, part 4
+
+					If we don’t maintain this, then B, C, ..., could start to grow, and we’ll be left with a tiny A and a large something else, which is poorly balanced
+B > C:
+Again, prevent imbalances
+				</section>
+				<section>
+					timsort, part 5
+
+					Galloping:
+I’m not as sold on this, as it can actually make performance worse
+Used during merge to find the right insertion point for an elephant
+Like doing binary search, but sideways
+				</section>
+				<section>
+					timsort example:random
+				</section>
+				<section>
+					timsort example:partially sorted
+				</section>
+				<section>
+					When to use what?
+
+					Slow comparison: timsort
+Python, Ruby, even Java
+Fast comparison: quicksort, mergesort
+C, C++ with ints, floats, doubles
+Huge data: mergesort variants
+Limited domain: bucket/radix sort
+				</section>
 			</div>
-		</div>
 
 		<script src="lib/js/head.min.js"></script>
 		<script src="js/reveal.js"></script>
 
 		<script>
-			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
 				history: true,
-
-				// More info https://github.com/hakimel/reveal.js#dependencies
+				transition: 'slide',
+				transitionSpeed: 'fast',
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+					{ src: 'plugin/math/math.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() {
+						hljs.initHighlightingOnLoad();
+						hljs.configure({tabReplace: '  '});
+					} }
 				]
 			});
 		</script>
