@@ -70,6 +70,15 @@
 			color: #fff;
 			border: 2px solid white;
 		}
+		.reveal .smallcaps {
+			font-variant-caps: small-caps;
+		}
+		.reveal .red {
+			color: #ff0000;
+		}
+		.reveal .blue {
+			color: #0000ff;
+		}
 		</style>
 	</head>
 	<body>
@@ -98,193 +107,375 @@ We'll do a quick tour of the fundamental sorting algorithms, like insertion sort
 				<a href="https://github.com/swenson">github.com/swenson</a>
 				</div>
 				<section>
-					<h1>Sorting!</h1>
+					<h2>Sorting!</h2>
 					<p><strong>Christopher Swenson</strong></p>
-					<p>Confoo.CA Montreal 2017</p>
+					<p>Confoo <span class="smallcaps">ca</span>, Montreal 2017</p>
 				</section>
 				<section>
-					<h1>What is this talk?</h1>
+					<h3>What is this talk?</h3>
 					<p>Sorting!</p>
+					<p>We'll talk about lots of algorithms, and focus on timsort</p>
 					<br />
 
-					<h2>Who is this talk for?</h2>
+					<h3>Who is this talk for?</h3>
 					<p>Curious people who love sorting</p>
 				</section>
 				<section>
+					<h3>Who am I?</h3>
+					<p>Christopher Swenson, Ph.D.</p>
+					<p>Currently at Twilio, previously Google, US Government, Simple, Capital One.</p>
+					<p>I love sorting.</p>
+					<p>I wrote a moderately popular <a href="https://github.com/swenson/sort">C sorting library</a></p>
+				</section>
+				<section>
+					<p><img src="sort-github.png" /></p>
+				</section>
+				<section>
+					<h3>Motivation</h3>
 					<p>I love sorting</p>
-					<p>I was interested in timsort in the past, and I learned how it worked</p>
-					<p>So I implemented it</p>
+					<p>In 2010, I decided to learn how timsort worked</p>
+					<p>So I implemented it, and a bunch of other things</p>
 				</section>
 				<section>
-					<h2>Sorting</h2>
-					Classic problem of computer science
-Sort quickly
-Sort with as little extra space as possible
-Not as simple as we'd initially think
-We'll focus on Python's own timsort
-				</section>
-				<section>
-					We’ve probably all “invented” this
-Bubble the largest element to the top
-Bubble the next largest, etc.
+					<h3>Sorting</h3>
+					<p>Classic problem of computer science</p>
 
+					<p>Sort quickly, and with little memory</p>
+
+					<p>Not as simple as we'd initially think</p>
+				</section>
+				<section>
+					<h3>Bubble sort</h3>
+					<p>We’ve probably all "invented" this:</p>
+					<ul>
+						<li>Bubble the largest element to the top</li>
+						<li>Bubble the next largest, etc.</li>
+					</ul>
+
+					<pre><code class="hljs" data-trim>
 for i in range(len(data)):
   for j in range(len(data) - i):
     if data[j + 1] < data[j]:
       data[j], data[j+1] = data[j+1], data[j]    
-
+</code></pre>
 				</section>
 				<section>
-					<h2>Don't ever use it</h2>
-					Promise me, if you learn one thing from this talk, it’s that you should never use bubble sort
-
+					<h1>Don't. Ever. Use. Bubble. Sort.</h2>
+					<p class="fragment">Promise me, if you learn one thing from this talk, it’s that you should never use bubble sort.</p>
 				</section>
 				<section>
-					But why?
+					<h3>But why?</h3>
 
-					We mostly compare sorting algorithms by
-Number of compares
-Number of swaps (less important)
-Compares are bad
-Expensive function calls (__cmp__)
+					<p>We mostly compare sorting algorithms by<p>
+					<ul>
+						<li>Number of compares</li>
+						<li>Number of swaps (less important)</li>
+					</ul>
+					<p>Compares are bad &mdash;<br />can involve expensive function calls (<code>__cmp__</code>)</p>
 				</section>
 				<section>
-					Bad bad bubble sort
+					<h3>Bad bad bubble sort</h3>
 
-					Bubble sort basically uses more compares than any other algorithm
-Exactly n * (n - 1) / 2
-O(n**2)
+					<p>Bubble sort basically uses more compares than any other reasonable algorithm</p>
+					<p>Exactly $\frac{N(N - 1)}{2}$ comparisons</p>
+					<p>$O(N^2)$ comparisons and memory movement</p>
 				</section>
 				<section>
-					What are some others?
+					<h3>What are some others?</h3>
 
-					Selection sort
-<strong>Insertion sort</strong>
-<strong>Quicksort</strong>
-<strong>Mergesort</strong>
-<strong>Timsort</strong>
-
-Heapsort
-Smoothsort
-Sample sort
-Bucket sort
-Bogosort
+					<table border="0">
+						<tr><td style="border: 0">selection sort</td><td style="border: 0">heap sort</td></tr>
+						<tr><td style="border: 0"><strong>insertion sort</strong></td><td style="border: 0">smooth sort</td></tr>
+						<tr><td style="border: 0"><strong>quick sort</strong></td><td style="border: 0">Sample sort</td></tr>
+						<tr><td style="border: 0"><strong>merge sort</strong></td><td style="border: 0">bucket sort</td></tr>
+						<tr><td style="border: 0"><strong>Tim sort</strong></td><td style="border: 0">bogo sort</td></tr>
+					</table>
 				</section>
 				<section>
-					Insertion sort
+					<h3>Insertion sort</h3>
 
-					Assume elements 0..(i-1) are sorted
-[0, 4, 7, 9, 10, 3, ...]
-[0, 4, 7, 9, 3, 10, ...]
-[0, 4, 7, 3, 9, 10, ...]
-[0, 4, 3, 7, 9, 10, ...]
-[0, 3, 4, 7, 9, 10, ...]
+					<p>Assume elements $0, \dots, i-1$ are sorted</p>
+					$$[0, 4, 7, 9, 10, {\bf 3}, \dots]$$
+					$$[0, 4, 7, 9, {\bf 3}, 10, \dots]$$
+					$$[0, 4, 7, {\bf 3}, 9, 10, \dots]$$
+					$$[0, 4, {\bf 3}, 7, 9, 10, \dots]$$
+					$$[0, {\bf 3}, 4, 7, 9, 10, \dots]$$
 				</section>
 				<section>
-					Insertion sort (cont’d.)
+					<p>Still $O(N^2)$ worst case, but not as terrible on average</p>
+					<p>Okay for short lists</p>
+				</section>
+				<section>
+					<h3>Detour: binary search</h3>
 
-					Still O(n**2) worst case, but not too terrible on average
-Fairly good for very short lists
+					<p>Previously, we wanted to put $3$ in $[0, 4, 7, 9, 10]$</p>
+					<p>Instead of right-to-left, let's:</p>
+					<ul>
+						<li>Start in the middle, $7$</li>
+						<li>3 < 7, so throw away right half</li>
+						<li>Repeat</li>
+					</ul>
+					<p>Instead of $O(N)$ comparisons, $O(\text{log}\ N)$</p>
+					<p>This is called <strong>Binary Insertion Sort</strong></p>
 				</section>
 				<section>
-					Detour: binary search
+					<h3>Quick sort</h3>
+					<p>Divide and conquer</p>
+					<ul>
+						<li>Pick element likely to be a median, called the <strong>pivot</strong> (common: pick end, pick the median of beginning, middle, end)</li>
+						<li>Separate into two lists: everything less than pivot, everything greater than pivot</li>
+						<li>Recursively quick sort each half</li>
+					</ul>
+				</section>
+				<section>
+					<p>[9, 10, 4, 0, 7, <span class="fragment highlight-current-red">3</span>]</p>
+				</section>
+				<section>
+					<p>[0], [3], [9, 10, 4, <span class="fragment highlight-current-red">7</span>]</p>
+				</section>
+				<section>
+					<p>[0], [3], [4], [7], [9, <span class="fragment highlight-current-red">10</span>]</p>
+				</section>
+				<section>
+					<p>[0], [3], [4], [7], [9], [10]</p>
+				</section>
+				<section>
+					<p>[0, 3, 4, 7, 9, 10]</p>
+				</section>
+				<section>
+					<h3>Merge sort</h3>
 
-					Wanted to put 3 in [0, 4, 7, 9, 10]
-Start in the middle, 7
-3 < 7, so throw away right half
-Repeat
-Instead of O(n) comparisons, O(log n)
-=> Binary Insertion Sort
+					<p>Recurse:</p>
+					<ul>
+						<li>Merge sort left half</li>
+						<li>Merge sort right half</li>
+						<li>Merge</li>
+					</ul>
 				</section>
 				<section>
-					mergesort
+					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10, 4, 0, 7, 3]</span></p>
+					<p class="fragment" data-fragment-index="1"># split</p>
+				</section>
+				<section>
+					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10, 4]</span>, [0, 7, 3]</p>
+					<p class="fragment" data-fragment-index="1"># split</p>
+				</section>
+				<section>
+					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10]</span>, [4], [0, 7, 3]</p>
+					<p class="fragment" data-fragment-index="1"># split</p>
+				</section>
+				<section>
+					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9]</span>, [10], [4], [0, 7, 3]</p>
+					<p class="fragment" data-fragment-index="1"># trivial</p>
+				</section>
+				<section>
+					<p><span class="fragment highlight-current-blue" data-fragment-index="1">[9]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[10]</span>, [4], [0, 7, 3]</p>
+					<p class="fragment" data-fragment-index="1"># merge</p>
+				</section>
+				<section>
+					<p><span class="fragment highlight-current-blue" data-fragment-index="1">[9, 10]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[4]</span>, [0, 7, 3]</p>
+					<p class="fragment" data-fragment-index="1"># merge</p>
+				</section>
+				<section>
+					<p>[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0, 7, 3]</span></p>
+					<p class="fragment" data-fragment-index="1"># split</p>
+				</section>
+				<section>
+					<p>[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0, 7]</span>, [3]</p>
+					<p class="fragment" data-fragment-index="1"># split</p>
+				</section>
+				<section>
+					<p>[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0]</span>, [7], [3]</p>
+					<p class="fragment" data-fragment-index="1"># trivial</p>
+				</section>
+				<section>
+					<p>[4, 9, 10], <span class="fragment highlight-current-blue" data-fragment-index="1">[0]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[7]</span>, [3]</p>
+					<p class="fragment" data-fragment-index="1"># merge</p>
+				</section>
+				<section>
+					<p>[4, 9, 10], <span class="fragment highlight-current-blue" data-fragment-index="1">[0, 7]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[3]</span></p>
+					<p class="fragment" data-fragment-index="1"># merge</p>
+				</section>
+				<section>
+					<p><span class="fragment highlight-current-blue" data-fragment-index="1">[4, 9, 10]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[0, 3, 7]</span></p>
+					<p class="fragment" data-fragment-index="1"># merge</p>
+				</section>
+				<section>
+					<p>[0, 3, 4, 7, 9, 10]</p>
+					<p class="fragment" data-fragment-index="1"># done</p>
+				</section>
+				<section>
+					<h3>Merge sort is good</h3>
 
-					Recurse: sort left half, sort right half, merge
-[9, 10, 4, 0, 7, 3] # split
-[9, 10, 4], red [0, 7, 3] # split
-blue [9, 10], [4], red [0, 7], [3] # split
-blue [9], blue [10], [4], red [0], red [7], [3] # merge
-blue [9, 10], blue [4], red [0, 7],red  [3] # merge
-blue [4, 9, 10], blue [0, 3, 7] # merge
-[0, 3, 4, 7, 9, 10] # sorted!
+					<p>Though simple, mergesort is world-class</p>
+					<ul>
+						<li>$O(N\,\text{log}\ N)$ compares</li>
+						<li>$O(N\,\text{log}\ N)$ memory moves</li>
+						<li>$O(\text{log}\ N)$ or $O(N)$ storage</li>
+					</ul>
+					<p>Simple, fast, but rigid</p>
 				</section>
 				<section>
-					mergesort is good
+					<h3>Tim sort</h3>
 
-					Though simple, mergesort is world-class
-O(n log n) compares
-O(log n) or O(n) storage
-Problems:
-Always O(n log n), even best case
-Can become unbalanced
+					<ul>
+						<li>Smart, unbalanced, stable mergesort</li>
+						<li>Take advantage of natural sortedness</li>
+						<li>But deal well with randomness</li>
+						<li>Above all: minimize comparisons</li>
+					</ul>
 				</section>
 				<section>
-					Enter: timsort
+					<ul>
+						<li>Build a stack of run sizes.</li>
+						(Run: increasing sequence, $[0, 2, 5, \dots]$)<br />
+						(If decreasing, reverse it in-place))
+						<li>Runs must have minimum size 32&ndash;64</li>
+						<li>If there is not a natural run, make one</li>
+						<li>Use binary insertion sort at low levels</li>
+					</ul>
+				</section>
+				<section>
+					<p>Key: be careful about creating unbalanced run sizes</p>
+					<p>Ensure that the stack of run sizes $[\dots, A, B, C]$ maintains:</p>
+					<ol>
+						<li>$A > B + C$</li>
+						<li>$B > C$</li>
+					</ol>
+					<p>Do left- and right-merges to maintain this</p>
+				</section>
+				<section>
+					<p>$A > B + C:$</p>
+					<ul>
+						<li>We eventually will merge $A$ with $B, C, \dots$</li>
+						<li>Want those merges balanced:</li>
+						<ul>
+							<li>Reduce memory usage</li>
+							<li>Reduce copying</li>
+						</ul>
+						<li>Poor balancing = insertion sort</li>
+					</ul>
+				</section>
+				<section>
+					<p>If we don’t maintain this:</p>
+					<ul>
+						<li>Then $B, C, \dots$, could start to grow</li>
+						<li>Left with a tiny $A$ and a large $B$.</li>
+					</ul>
+					<p>Other invariant also to prevent imbalances: $B > C$</p>
+				</section>
+				<section>
+					<h3>So, that was slightly a lie</h3>
+					<p>Turns out, <a href="http://envisage-project.eu/proving-android-java-and-python-sorting-algorithm-is-broken-and-how-to-fix-it/">that was wrong</a></p>
+				</section>
+				<section>
+					<p>After 13 years, found out: invariants are wrong</p>
+					<p>With stack of run sizes: $[\dots, A, B, C, D]$</p>
+					<ol>
+						<li>$B > C + D$</li>
+						<li>$A > B + C$</li>
+						<li>$C > D$</li>
+					</ol>
+				</section>
+				<section>
+					<h3>Tim sort galloping</h3>
 
-					Smart, unbalanced, stable mergesort
-Take advantage of natural sortedness
-But deal well with randomness
-Above all: minimize comparisons
+					<ul>
+						<li>Like doing binary search during merge, but sideways</li>
+						<li>Check position $1, 2, 4, 8, \dots$</li>
+						<li>Good when there are a lot of duplicates</li>
+						<li>Can make performance worse with no or few dupes</li>
+						<li>I'm not as sold on this</li>
+					</ul>
 				</section>
 				<section>
-					timsort, part 1
-
-					Build a stack of run sizes:
-Run: increasing sequence, [0, 2, 5, ...]
-(If decreasing, reverse it in-place)
-Runs must have size 32–64
-If there is not a natural run, make one
-Use binary insertion sort
+					<h3>Tim sort example: random numbers</h3>
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-1.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-2.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-3.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-4.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-5.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-6.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-7.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-partially-sorted-8.svg" />
 				</section>
 				<section>
-					timsort, part 2
-
-					Also, be very careful about creating unbalanced run sizes
-Ensure that the stack [..., A, B, C] maintains:
-A > B + C
-B > C
-Do left- and right-merges to maintain this
+					<h3>Tim sort example: partially sorted</h3>
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-1.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-2.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-3.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-4.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-5.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-6.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-7.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-8.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-9.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-10.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-11.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-12.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-13.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-14.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-15.svg" />
+				</section>
+				<section data-transition="none">
+					<img src="timsort-random-16.svg" />
 				</section>
 				<section>
-					timsort, part 3
-
-					A > B + C:
-We eventually will merge A with B, C, ...
-Want those merges balanced:
-Reduce memory usage
-Reduce copying
-Poor balancing = insertion sort
-				</section>
-				<section>
-					timsort, part 4
-
-					If we don’t maintain this, then B, C, ..., could start to grow, and we’ll be left with a tiny A and a large something else, which is poorly balanced
-B > C:
-Again, prevent imbalances
-				</section>
-				<section>
-					timsort, part 5
-
-					Galloping:
-I’m not as sold on this, as it can actually make performance worse
-Used during merge to find the right insertion point for an elephant
-Like doing binary search, but sideways
-				</section>
-				<section>
-					timsort example:random
-				</section>
-				<section>
-					timsort example:partially sorted
-				</section>
-				<section>
-					When to use what?
-
-					Slow comparison: timsort
-Python, Ruby, even Java
-Fast comparison: quicksort, mergesort
-C, C++ with ints, floats, doubles
-Huge data: mergesort variants
-Limited domain: bucket/radix sort
+					<h3>When to use what?</h3>
+					<ul>
+						<li>Slow comparison: Tim sort</li>
+						(Python, Ruby, even Java)
+						<li>Fast comparison: quick sort, merge sort</li>
+						(C, C++ with <code>int</code>s, <code>float</code>s, <code>double</code>s)
+						<li>Huge data: merge sort variants</li>
+						<li>Limited domain: bucket/radix sort</li>
+					</ul>
 				</section>
 			</div>
 
