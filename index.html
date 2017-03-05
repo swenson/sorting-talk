@@ -79,6 +79,12 @@
 		.reveal .blue {
 			color: #0000ff;
 		}
+		.reveal p {
+			text-align: left;
+		}
+		.reveal p.center {
+			text-align: center;
+		}
 		</style>
 	</head>
 	<body>
@@ -108,12 +114,12 @@ We'll do a quick tour of the fundamental sorting algorithms, like insertion sort
 				</div>
 				<section>
 					<h2>Sorting!</h2>
-					<p><strong>Christopher Swenson</strong></p>
-					<p>Confoo <span class="smallcaps">ca</span>, Montreal 2017</p>
+					<p class="center"><strong>Christopher Swenson</strong></p>
+					<p class="center">Confoo <span class="smallcaps">ca</span>, Montreal 2017</p>
 				</section>
 				<section>
 					<h3>What is this talk?</h3>
-					<p>Sorting!</p>
+					<p class="center">Sorting!</p>
 					<p>We'll talk about lots of algorithms, and focus on timsort</p>
 					<br />
 
@@ -132,8 +138,7 @@ We'll do a quick tour of the fundamental sorting algorithms, like insertion sort
 				</section>
 				<section>
 					<h3>Motivation</h3>
-					<p>I love sorting</p>
-					<p>In 2010, I decided to learn how timsort worked</p>
+					<p>In 2010, I decided to learn how tim sort worked</p>
 					<p>So I implemented it, and a bunch of other things</p>
 				</section>
 				<section>
@@ -142,7 +147,8 @@ We'll do a quick tour of the fundamental sorting algorithms, like insertion sort
 
 					<p>Sort quickly, and with little memory</p>
 
-					<p>Not as simple as we'd initially think</p>
+					<p>Not as simple as we'd <a href="https://github.com/lattera/glibc/blob/master/stdlib/qsort.c">initially think</a></p>
+					<p>Sidenote: a lot of things aren't (e.g., <a href="https://github.com/lattera/glibc/blob/master/string/strlen.c"><code>strlen</code></a>)</p>
 				</section>
 				<section>
 					<h3>Bubble sort</h3>
@@ -171,12 +177,12 @@ for i in range(len(data)):
 						<li>Number of compares</li>
 						<li>Number of swaps (less important)</li>
 					</ul>
-					<p>Compares are bad &mdash;<br />can involve expensive function calls (<code>__cmp__</code>)</p>
+					<p>Compares are bad: can involve expensive function calls (<code>.__cmp__()</code>, <code>.compareTo()</code>)</p>
 				</section>
 				<section>
 					<h3>Bad bad bubble sort</h3>
 
-					<p>Bubble sort basically uses more compares than any other reasonable algorithm</p>
+					<p>Uses more compares than any other (reasonable) algorithm</p>
 					<p>Exactly $\frac{N(N - 1)}{2}$ comparisons</p>
 					<p>$O(N^2)$ comparisons and memory movement</p>
 				</section>
@@ -186,7 +192,7 @@ for i in range(len(data)):
 					<table border="0">
 						<tr><td style="border: 0">selection sort</td><td style="border: 0">heap sort</td></tr>
 						<tr><td style="border: 0"><strong>insertion sort</strong></td><td style="border: 0">smooth sort</td></tr>
-						<tr><td style="border: 0"><strong>quick sort</strong></td><td style="border: 0">Sample sort</td></tr>
+						<tr><td style="border: 0"><strong>quick sort</strong></td><td style="border: 0">sample sort</td></tr>
 						<tr><td style="border: 0"><strong>merge sort</strong></td><td style="border: 0">bucket sort</td></tr>
 						<tr><td style="border: 0"><strong>Tim sort</strong></td><td style="border: 0">bogo sort</td></tr>
 					</table>
@@ -195,11 +201,22 @@ for i in range(len(data)):
 					<h3>Insertion sort</h3>
 
 					<p>Assume elements $0, \dots, i-1$ are sorted</p>
-					$$[0, 4, 7, 9, 10, {\bf 3}, \dots]$$
-					$$[0, 4, 7, 9, {\bf 3}, 10, \dots]$$
-					$$[0, 4, 7, {\bf 3}, 9, 10, \dots]$$
-					$$[0, 4, {\bf 3}, 7, 9, 10, \dots]$$
-					$$[0, {\bf 3}, 4, 7, 9, 10, \dots]$$
+					<p>Example: insert $3$ into $[0, 4, 7, 9, 10]$:</p>
+				</section>
+				<section data-transition="none">
+					[0, 4, 7, 9, 10, <span class="red">3</span>]
+				</section>
+				<section data-transition="none">
+					[0, 4, 7, 9, <span class="red">3</span>, 10]
+				</section>
+				<section data-transition="none">
+					[0, 4, 7, <span class="red">3</span>, 9, 10]
+				</section>
+				<section data-transition="none">
+					[0, 4, <span class="red">3</span>, 7, 9, 10]
+				</section>
+				<section data-transition="none">
+					[0, <span class="red">3</span>, 4, 7, 9, 10]
 				</section>
 				<section>
 					<p>Still $O(N^2)$ worst case, but not as terrible on average</p>
@@ -208,15 +225,23 @@ for i in range(len(data)):
 				<section>
 					<h3>Detour: binary search</h3>
 
-					<p>Previously, we wanted to put $3$ in $[0, 4, 7, 9, 10]$</p>
-					<p>Instead of right-to-left, let's:</p>
+					<p>Previously, we wanted to put $3$ in $[0, 4, 7, 9, 10]$. Instead of right-to-left, let's:</p>
 					<ul>
-						<li>Start in the middle, $7$</li>
-						<li>3 < 7, so throw away right half</li>
-						<li>Repeat</li>
+						<li>Start in the middle: $7$</li>
+						<li>$3 < 7$ so throw away right half</li>
+						<li>Recurse</li>
 					</ul>
-					<p>Instead of $O(N)$ comparisons, $O(\text{log}\ N)$</p>
+					<p>$O(\text{log}\ N)$ comparisons instead of $O(N)$, but still $O(N^2)$ memory movement.</p>
 					<p>This is called <strong>Binary Insertion Sort</strong></p>
+				</section>
+				<section data-transition="none">
+					[0, 4, 7, 9, 10, <span class="red">3</span>]
+				</section>
+				<section data-transition="none">
+					[0, 4, <span class="red">3</span>, 7, 9, 10]
+				</section>
+				<section data-transition="none">
+					[0, <span class="red">3</span>, 4, 7, 9, 10]
 				</section>
 				<section>
 					<h3>Quick sort</h3>
@@ -227,82 +252,82 @@ for i in range(len(data)):
 						<li>Recursively quick sort each half</li>
 					</ul>
 				</section>
-				<section>
-					<p>[9, 10, 4, 0, 7, <span class="fragment highlight-current-red">3</span>]</p>
+				<section data-transition="none">
+					<p class="center">[9, 10, 4, 0, 7, <span class="fragment highlight-current-red">3</span>]</p>
 				</section>
-				<section>
-					<p>[0], [3], [9, 10, 4, <span class="fragment highlight-current-red">7</span>]</p>
+				<section data-transition="none">
+					<p class="center">[0], [3], [9, 10, 4, <span class="fragment highlight-current-red">7</span>]</p>
 				</section>
-				<section>
-					<p>[0], [3], [4], [7], [9, <span class="fragment highlight-current-red">10</span>]</p>
+				<section data-transition="none">
+					<p class="center">[0], [3], [4], [7], [9, <span class="fragment highlight-current-red">10</span>]</p>
 				</section>
-				<section>
-					<p>[0], [3], [4], [7], [9], [10]</p>
+				<section data-transition="none">
+					<p class="center">[0], [3], [4], [7], [9], [10]</p>
 				</section>
-				<section>
-					<p>[0, 3, 4, 7, 9, 10]</p>
+				<section data-transition="none">
+					<p class="center">[0, 3, 4, 7, 9, 10]</p>
 				</section>
 				<section>
 					<h3>Merge sort</h3>
 
-					<p>Recurse:</p>
+					<p class="center">Recurse:</p>
 					<ul>
 						<li>Merge sort left half</li>
 						<li>Merge sort right half</li>
 						<li>Merge</li>
 					</ul>
 				</section>
-				<section>
-					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10, 4, 0, 7, 3]</span></p>
-					<p class="fragment" data-fragment-index="1"># split</p>
+				<section data-transition="none">
+					<p class="center"><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10, 4, 0, 7, 3]</span></p>
+					<p class="fragment center" data-fragment-index="1"># split</p>
 				</section>
-				<section>
-					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10, 4]</span>, [0, 7, 3]</p>
-					<p class="fragment" data-fragment-index="1"># split</p>
+				<section data-transition="none">
+					<p class="center"><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10, 4]</span>, [0, 7, 3]</p>
+					<p class="fragment center" data-fragment-index="1"># split</p>
 				</section>
-				<section>
-					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10]</span>, [4], [0, 7, 3]</p>
-					<p class="fragment" data-fragment-index="1"># split</p>
+				<section data-transition="none">
+					<p class="center"><span class="fragment highlight-current-red" data-fragment-index="1">[9, 10]</span>, [4], [0, 7, 3]</p>
+					<p class="fragment center" data-fragment-index="1"># split</p>
 				</section>
-				<section>
-					<p><span class="fragment highlight-current-red" data-fragment-index="1">[9]</span>, [10], [4], [0, 7, 3]</p>
-					<p class="fragment" data-fragment-index="1"># trivial</p>
+				<section data-transition="none">
+					<p class="center"><span class="fragment highlight-current-red" data-fragment-index="1">[9]</span>, [10], [4], [0, 7, 3]</p>
+					<p class="fragment center" data-fragment-index="1"># trivial</p>
 				</section>
-				<section>
-					<p><span class="fragment highlight-current-blue" data-fragment-index="1">[9]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[10]</span>, [4], [0, 7, 3]</p>
-					<p class="fragment" data-fragment-index="1"># merge</p>
+				<section data-transition="none">
+					<p class="center"><span class="fragment highlight-current-blue" data-fragment-index="1">[9]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[10]</span>, [4], [0, 7, 3]</p>
+					<p class="fragment center" data-fragment-index="1"># merge</p>
 				</section>
-				<section>
-					<p><span class="fragment highlight-current-blue" data-fragment-index="1">[9, 10]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[4]</span>, [0, 7, 3]</p>
-					<p class="fragment" data-fragment-index="1"># merge</p>
+				<section data-transition="none">
+					<p class="center"><span class="fragment highlight-current-blue" data-fragment-index="1">[9, 10]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[4]</span>, [0, 7, 3]</p>
+					<p class="fragment center" data-fragment-index="1"># merge</p>
 				</section>
-				<section>
-					<p>[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0, 7, 3]</span></p>
-					<p class="fragment" data-fragment-index="1"># split</p>
+				<section data-transition="none">
+					<p class="center">[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0, 7, 3]</span></p>
+					<p class="fragment center" data-fragment-index="1"># split</p>
 				</section>
-				<section>
-					<p>[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0, 7]</span>, [3]</p>
-					<p class="fragment" data-fragment-index="1"># split</p>
+				<section data-transition="none">
+					<p class="center">[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0, 7]</span>, [3]</p>
+					<p class="fragment center" data-fragment-index="1"># split</p>
 				</section>
-				<section>
-					<p>[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0]</span>, [7], [3]</p>
-					<p class="fragment" data-fragment-index="1"># trivial</p>
+				<section data-transition="none">
+					<p class="center">[4, 9, 10], <span class="fragment highlight-current-red" data-fragment-index="1">[0]</span>, [7], [3]</p>
+					<p class="fragment center" data-fragment-index="1"># trivial</p>
 				</section>
-				<section>
-					<p>[4, 9, 10], <span class="fragment highlight-current-blue" data-fragment-index="1">[0]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[7]</span>, [3]</p>
-					<p class="fragment" data-fragment-index="1"># merge</p>
+				<section data-transition="none">
+					<p class="center">[4, 9, 10], <span class="fragment highlight-current-blue" data-fragment-index="1">[0]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[7]</span>, [3]</p>
+					<p class="fragment center" data-fragment-index="1"># merge</p>
 				</section>
-				<section>
-					<p>[4, 9, 10], <span class="fragment highlight-current-blue" data-fragment-index="1">[0, 7]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[3]</span></p>
-					<p class="fragment" data-fragment-index="1"># merge</p>
+				<section data-transition="none">
+					<p class="center">[4, 9, 10], <span class="fragment highlight-current-blue" data-fragment-index="1">[0, 7]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[3]</span></p>
+					<p class="fragment center" data-fragment-index="1"># merge</p>
 				</section>
-				<section>
-					<p><span class="fragment highlight-current-blue" data-fragment-index="1">[4, 9, 10]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[0, 3, 7]</span></p>
-					<p class="fragment" data-fragment-index="1"># merge</p>
+				<section data-transition="none">
+					<p class="center"><span class="fragment highlight-current-blue" data-fragment-index="1">[4, 9, 10]</span>, <span class="fragment highlight-current-blue" data-fragment-index="1">[0, 3, 7]</span></p>
+					<p class="fragment center" data-fragment-index="1"># merge</p>
 				</section>
-				<section>
-					<p>[0, 3, 4, 7, 9, 10]</p>
-					<p class="fragment" data-fragment-index="1"># done</p>
+				<section data-transition="none">
+					<p class="center">[0, 3, 4, 7, 9, 10]</p>
+					<p class="fragment center" data-fragment-index="1"># done</p>
 				</section>
 				<section>
 					<h3>Merge sort is good</h3>
@@ -319,7 +344,7 @@ for i in range(len(data)):
 					<h3>Tim sort</h3>
 
 					<ul>
-						<li>Smart, unbalanced, stable mergesort</li>
+						<li>Smart balancing merge sort</li>
 						<li>Take advantage of natural sortedness</li>
 						<li>But deal well with randomness</li>
 						<li>Above all: minimize comparisons</li>
@@ -327,9 +352,10 @@ for i in range(len(data)):
 				</section>
 				<section>
 					<ul>
-						<li>Build a stack of run sizes.</li>
-						(Run: increasing sequence, $[0, 2, 5, \dots]$)<br />
-						(If decreasing, reverse it in-place))
+						<li>Iterate through array</li>
+						<li>Build a stack of <strong>run</strong> sizes.</li>
+						(Run: increasing sequence)<br />
+						(If decreasing, reverse it in-place)
 						<li>Runs must have minimum size 32&ndash;64</li>
 						<li>If there is not a natural run, make one</li>
 						<li>Use binary insertion sort at low levels</li>
@@ -360,17 +386,16 @@ for i in range(len(data)):
 					<p>If we don’t maintain this:</p>
 					<ul>
 						<li>Then $B, C, \dots$, could start to grow</li>
-						<li>Left with a tiny $A$ and a large $B$.</li>
+						<li>Later left with a tiny $A$ and a large $B$.</li>
 					</ul>
-					<p>Other invariant also to prevent imbalances: $B > C$</p>
 				</section>
 				<section>
 					<h3>So, that was slightly a lie</h3>
-					<p>Turns out, <a href="http://envisage-project.eu/proving-android-java-and-python-sorting-algorithm-is-broken-and-how-to-fix-it/">that was wrong</a></p>
+					<p class="center">Turns out, <a href="http://envisage-project.eu/proving-android-java-and-python-sorting-algorithm-is-broken-and-how-to-fix-it/">that was wrong</a></p>
 				</section>
 				<section>
-					<p>After 13 years, found out: invariants are wrong</p>
-					<p>With stack of run sizes: $[\dots, A, B, C, D]$</p>
+					<p>After 13 years, found out the invariants are wrong</p>
+					<p>With stack of run sizes: $[\dots, A, B, C, D]$, need:</p>
 					<ol>
 						<li>$B > C + D$</li>
 						<li>$A > B + C$</li>
@@ -384,12 +409,13 @@ for i in range(len(data)):
 						<li>Like doing binary search during merge, but sideways</li>
 						<li>Check position $1, 2, 4, 8, \dots$</li>
 						<li>Good when there are a lot of duplicates</li>
-						<li>Can make performance worse with no or few dupes</li>
+						<li>Can make performance worse with small-to-medium # dupes</li>
 						<li>I'm not as sold on this</li>
 					</ul>
 				</section>
 				<section>
-					<h3>Tim sort example: random numbers</h3>
+					<h3>Tim sort example</h3>
+					<h3>Partially sorted numbers</h3>
 				</section>
 				<section data-transition="none">
 					<img src="timsort-partially-sorted-1.svg" />
@@ -416,7 +442,8 @@ for i in range(len(data)):
 					<img src="timsort-partially-sorted-8.svg" />
 				</section>
 				<section>
-					<h3>Tim sort example: partially sorted</h3>
+					<h3>Tim sort example:</h3>
+					<h3>Random numbers</h3>
 				</section>
 				<section data-transition="none">
 					<img src="timsort-random-1.svg" />
@@ -470,9 +497,9 @@ for i in range(len(data)):
 					<h3>When to use what?</h3>
 					<ul>
 						<li>Slow comparison: Tim sort</li>
-						(Python, Ruby, even Java)
-						<li>Fast comparison: quick sort, merge sort</li>
-						(C, C++ with <code>int</code>s, <code>float</code>s, <code>double</code>s)
+						(Python, Ruby, Java)
+						<li>Fast comparison: quick sort, merge sort, heap sort</li>
+						(C/C++ primitive types)
 						<li>Huge data: merge sort variants</li>
 						<li>Limited domain: bucket/radix sort</li>
 					</ul>
