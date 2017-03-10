@@ -120,33 +120,30 @@ We'll do a quick tour of the fundamental sorting algorithms, like insertion sort
 				<section>
 					<h3>What is this talk?</h3>
 					<p class="center">Sorting!</p>
-					<p>We'll talk about lots of algorithms, and focus on timsort</p>
+					<p>We'll talk about lots of algorithms, and including quick sort, merge sort, and tim sort.</p>
 					<br />
 
 					<h3>Who is this talk for?</h3>
-					<p>Curious people who love sorting</p>
+					<p>Curious people who love sorting.</p>
 				</section>
 				<section>
 					<h3>Who am I?</h3>
 					<p>Christopher Swenson, Ph.D.</p>
 					<p>Currently at Twilio, previously Google, US Government, Simple, Capital One.</p>
 					<p>I love sorting.</p>
-					<p>I wrote a moderately popular <a href="https://github.com/swenson/sort">C sorting library</a></p>
+					<p>I wrote a moderately popular <a href="https://github.com/swenson/sort">C sorting library</a>.</p>
 				</section>
 				<section>
 					<p><img src="sort-github.png" /></p>
 				</section>
 				<section>
 					<h3>Motivation</h3>
-					<p>In 2010, I decided to learn how tim sort worked</p>
-					<p>So I implemented it, and a bunch of other things</p>
+					<p>In 2010, I wanted to learn how tim sort worked</p>
+					<p>So I implemented a bunch of sorts, including tim sort</p>
 				</section>
 				<section>
 					<h3>Sorting</h3>
-					<p>Classic problem of computer science</p>
-
-					<p>Sort quickly, and with little memory</p>
-
+					<p>One of <emph>the</emph> classic problems of computer science</p>
 					<p>Not as simple as we'd <a href="https://github.com/lattera/glibc/blob/master/stdlib/qsort.c">initially think</a></p>
 					<p>Sidenote: a lot of things aren't (e.g., <a href="https://github.com/lattera/glibc/blob/master/string/strlen.c"><code>strlen</code></a>)</p>
 				</section>
@@ -177,7 +174,7 @@ for i in range(len(data)):
 						<li>Number of compares</li>
 						<li>Number of swaps (less important)</li>
 					</ul>
-					<p>Compares are bad: can involve expensive function calls (<code>.__cmp__()</code>, <code>.compareTo()</code>)</p>
+					<p>Compares are bad: can involve expensive function calls (<code><a href="https://swenson.github.io/python-xr/Objects/listobject.c.html#line-1029">.__cmp__()</a></code>, <code>.compareTo()</code>)</p>
 				</section>
 				<section>
 					<h3>Bad bad bubble sort</h3>
@@ -190,12 +187,14 @@ for i in range(len(data)):
 					<h3>What are some others?</h3>
 
 					<table border="0">
-						<tr><td style="border: 0">selection sort</td><td style="border: 0">heap sort</td></tr>
-						<tr><td style="border: 0"><strong>insertion sort</strong></td><td style="border: 0">smooth sort</td></tr>
-						<tr><td style="border: 0"><strong>quick sort</strong></td><td style="border: 0">sample sort</td></tr>
-						<tr><td style="border: 0"><strong>merge sort</strong></td><td style="border: 0">bucket sort</td></tr>
-						<tr><td style="border: 0"><strong>Tim sort</strong></td><td style="border: 0">bogo sort</td></tr>
+						<tr><td style="border: 0">selection sort (127,176 µs)</td><td style="border: 0">heap sort (592 µs)</td></tr>
+						<tr><td style="border: 0"><strong>insertion sort</strong> (13,443 µs)</td><td style="border: 0">smooth sort</td></tr>
+						<tr><td style="border: 0"><strong>quick sort</strong> (579 µs)</td><td style="border: 0">sample sort</td></tr>
+						<tr><td style="border: 0"><strong>merge sort</strong> (903 µs)</td><td style="border: 0">bucket sort</td></tr>
+						<tr><td style="border: 0"><strong>Tim sort</strong> (1005 µs)</td><td style="border: 0">bogo sort</td></tr>
 					</table>
+
+					<p class="center"><small>Timings for sorting 10,000 random 64-bit ints in C on my laptop.</small></p>
 				</section>
 				<section>
 					<h3>Insertion sort</h3>
@@ -268,6 +267,12 @@ for i in range(len(data)):
 					<p class="center">[0, 3, 4, 7, 9, 10]</p>
 				</section>
 				<section>
+					<h3>Quick sort is good</h3>
+					<p>For many, quick sort is among the best.</p>
+					<p>Often the default or first thing people think of.</p>
+					<p>For special cases, it can perform poorly.</p>
+				</section>
+				<section>
 					<h3>Merge sort</h3>
 
 					<p class="center">Recurse:</p>
@@ -332,7 +337,7 @@ for i in range(len(data)):
 				<section>
 					<h3>Merge sort is good</h3>
 
-					<p>Though simple, mergesort is world-class</p>
+					<p>Though simple, merge sort is world-class</p>
 					<ul>
 						<li>$O(N\,\text{log}\ N)$ compares</li>
 						<li>$O(N\,\text{log}\ N)$ memory moves</li>
